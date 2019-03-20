@@ -68,8 +68,8 @@ OR
     {"action": "call"}
 ]
 ```
-
-In the limited version, user only allowed to raise for four time in one round game.    
-In addition, in each street (preflop,flop,turn,river),each player only allowed to raise for four times.
+   
+In each street (preflop,flop,turn,river), each player only allowed to raise for four times. So for a game, 
+each player can raise a maximum of 16 times.
 
 Other information is similar to the PyPokerEngine,please check the detail about the parameter [link](https://github.com/ishikota/PyPokerEngine/blob/master/AI_CALLBACK_FORMAT.md)

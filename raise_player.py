@@ -25,7 +25,10 @@ class RaisedPlayer(BasePokerPlayer):
     pass
 
   def receive_round_result_message(self, winners, hand_info, round_state):
-    pass
+    # output action history
+    print("My ID (round result - random) : "+self.uuid)
+    pprint.pprint(round_state)
+
 
 def setup_ai():
   return RandomPlayer()
