@@ -19,9 +19,7 @@ class HonestPlayer(BasePokerPlayer):
     can_raise = len([item for item in valid_actions if item['action'] == 'raise']) > 0
     
     if win_rate >= 0.5:
-      if win_rate > 0.85:
-        action = valid_actions[2]['action'] if can_raise else valid_actions[1]['action']
-      elif win_rate > 0.75:
+      if win_rate > 0.75:
         action = valid_actions[2]['action'] if can_raise else valid_actions[1]['action']
       else:
         action = valid_actions[1]['action']
