@@ -5,7 +5,7 @@ from pypokerengine.engine.card import Card
 ACE = 14
 KING = 13
 QUEEN = 12
-JACK = 12
+JACK = 11
 
 
 class ChenFormula:
@@ -34,6 +34,9 @@ class ChenFormula:
         card_one_suit = Card.from_str(our_starting_hand[0]).suit
         card_two_rank = Card.from_str(our_starting_hand[1]).rank
         card_two_suit = Card.from_str(our_starting_hand[1]).suit
+
+        if card_one_rank == card_two_rank and card_one_suit == card_two_suit:
+            raise Exception("You cannot have 2 cards of the same rank and suite!")
 
         high_rank = max(card_one_rank, card_two_rank)
         low_rank = min(card_one_rank, card_two_rank)
@@ -78,7 +81,7 @@ class ChenFormula:
             score -= gap_between_cards
         elif gap_between_cards == 3:
             score -= 4.0
-        elif gap_between_cards > 3:
+        elif gap_between_cards >= 4:
             score -= 5.0
 
         """
