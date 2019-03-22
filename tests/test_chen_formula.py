@@ -18,13 +18,16 @@ class TestChenFormula(unittest.TestCase):
 
     def test_chen_formula_exception(self):
         with self.assertRaises(Exception) as error:
-            self.hand_strength.score(["SA"])
+            self.hand_strength.score([]) # Empty
         self.assertTrue('Your starting hands must have 2 cards!' in error.exception)
         with self.assertRaises(Exception) as error:
-            self.hand_strength.score(["SA"])
+            self.hand_strength.score(["SA"]) # 1 card
         self.assertTrue('Your starting hands must have 2 cards!' in error.exception)
         with self.assertRaises(Exception) as error:
-            self.hand_strength.score(["SA", "SA"])
+            self.hand_strength.score(["SA", "DA", "CA"]) # 3 cards
+        self.assertTrue('Your starting hands must have 2 cards!' in error.exception)
+        with self.assertRaises(Exception) as error:
+            self.hand_strength.score(["SA", "SA"]) # 2 same cards
         self.assertTrue('You cannot have 2 cards of the same rank and suite!' in error.exception)
 
     def tearDown(self):
