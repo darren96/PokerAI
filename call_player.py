@@ -1,10 +1,9 @@
 from pypokerengine.players import BasePokerPlayer
-import pprint
 
 class CallPlayer(BasePokerPlayer):
 
   def declare_action(self, valid_actions, hole_card, round_state):
-    action = "call"
+    action = valid_actions[1]['action']
     return action  # action returned here is sent to the poker engine
 
   def receive_game_start_message(self, game_info):
