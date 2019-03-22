@@ -1,4 +1,4 @@
-## Term Project
+## CS3243 POK-AI
 
 ### Set up environment
 using the conda or pyenv
