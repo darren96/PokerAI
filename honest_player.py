@@ -1,5 +1,6 @@
 from pypokerengine.players import BasePokerPlayer
 from pypokerengine.utils.card_utils import gen_cards, estimate_hole_card_win_rate
+import pprint
 
 NB_SIMULATION = 1000
 
@@ -9,18 +10,27 @@ class HonestPlayer(BasePokerPlayer):
     community_card = round_state['community_card']
     win_rate = estimate_hole_card_win_rate(
       nb_simulation = NB_SIMULATION,
-      nb_player = 2,
+      nb_player = self.num_players,
       hole_card = gen_cards(hole_card),
       community_card = gen_cards(community_card)
     )
-    if win_rate >= 1.0 / 2:
-      action = valid_actions[1]['action']
+
+    can_call = len([item for item in valid_actions if item['action'] == 'call']) > 0
+    can_raise = len([item for item in valid_actions if item['action'] == 'raise']) > 0
+    
+    if win_rate >= 0.5:
+      if win_rate > 0.85:
+        action = valid_actions[2]['action'] if can_raise else valid_actions[1]['action']
+      elif win_rate > 0.75:
+        action = valid_actions[2]['action'] if can_raise else valid_actions[1]['action']
+      else:
+        action = valid_actions[1]['action']
     else:
-      action = valid_actions[0]['action']
+      action = valid_actions[1]['action'] if can_call else valid_actions[0]['action']
     return action  # action returned here is sent to the poker engine
 
   def receive_game_start_message(self, game_info):
-    pass
+    self.num_players = game_info['player_num']
 
   def receive_round_start_message(self, round_count, hole_card, seats):
     pass
@@ -32,6 +42,8 @@ class HonestPlayer(BasePokerPlayer):
     pass
 
   def receive_round_result_message(self, winners, hand_info, round_state):
+    # print("My ID (round result - random) : "+self.uuid)
+    # pprint.pprint(round_state)
     pass
 
 def setup_ai():
