@@ -17,14 +17,17 @@ class HonestPlayer(BasePokerPlayer):
 
     can_call = len([item for item in valid_actions if item['action'] == 'call']) > 0
     can_raise = len([item for item in valid_actions if item['action'] == 'raise']) > 0
+
+    # print("HonestP hole card: "+ str(hole_card))
+    # print("Winrate: "+ str(win_rate))
     
-    if win_rate >= 0.5:
-      if win_rate > 0.75:
+    if win_rate >= 0.35:
+      if win_rate > 0.7:
         action = valid_actions[2]['action'] if can_raise else valid_actions[1]['action']
       else:
         action = valid_actions[1]['action']
     else:
-      action = valid_actions[1]['action'] if can_call else valid_actions[0]['action']
+      action = "fold"
     return action  # action returned here is sent to the poker engine
 
   def receive_game_start_message(self, game_info):
