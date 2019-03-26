@@ -4,7 +4,7 @@ import pprint
 
 NB_SIMULATION = 1000
 
-class HonestPlayer(BasePokerPlayer):
+class BluffPlayer(BasePokerPlayer):
 
   def declare_action(self, valid_actions, hole_card, round_state):
     community_card = round_state['community_card']
@@ -27,7 +27,7 @@ class HonestPlayer(BasePokerPlayer):
       else:
         action = valid_actions[1]['action']
     else:
-      action = "fold"
+      action = "call"
     return action  # action returned here is sent to the poker engine
 
   def receive_game_start_message(self, game_info):
