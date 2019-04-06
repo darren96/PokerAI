@@ -1,4 +1,4 @@
-## CS3243 POK-AI
+## Term Project
 
 ### Set up environment
 using the conda or pyenv
@@ -68,8 +68,8 @@ OR
     {"action": "call"}
 ]
 ```
-   
-In each street (preflop,flop,turn,river), each player only allowed to raise for four times. So for a game, 
-each player can raise a maximum of 16 times.
+
+In the limited version, the user only allowed to raise for four times in one round street.
+In each round, the players can only play raise four times.[In the pre-flop street, the big blind is considered as a Raise action.]
 
 Other information is similar to the PyPokerEngine,please check the detail about the parameter [link](https://github.com/ishikota/PyPokerEngine/blob/master/AI_CALLBACK_FORMAT.md)
