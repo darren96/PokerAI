@@ -1,0 +1,11 @@
+ai_players:
+- name: honest_player
+  path: honest_player.py
+- name: monte_carlo_player
+  path: monte_carlo_player.py
+ante: 0
+blind_structure: null
+initial_stack: 100
+max_round: 10
+small_blind: 10
+

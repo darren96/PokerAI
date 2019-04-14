@@ -9,7 +9,13 @@ import time
 from argparse import ArgumentParser
 
 """ =========== *Remember to import your agent!!! =========== """
-from randomplayer import RandomPlayer
+from players.randomplayer import RandomPlayer
+from players.honest_player import HonestPlayer
+from players.call_player import CallPlayer
+from players.raise_player import RaisedPlayer
+from players.bluff_player import BluffPlayer
+from players.darren_player import DarrenPlayer
+# from cfr_player import CfrPlayer
 
 # from smartwarrior import SmartWarrior
 """ ========================================================= """
@@ -31,12 +37,15 @@ def testperf(agent_name1, agent1, agent_name2, agent2):
     agent1_pot = 0
     agent2_pot = 0
 
+    agent_name1 = "CfrPlayer"
+    agent_name2 = "DarrenPlayer"
+
     # Setting configuration
     config = setup_config(max_round=max_round, initial_stack=initial_stack, small_blind_amount=smallblind_amount)
 
     # Register players
-    config.register_player(name=agent_name1, algorithm=RandomPlayer())
-    config.register_player(name=agent_name2, algorithm=RandomPlayer())
+    config.register_player(name=agent_name1, algorithm=HonestPlayer())
+    config.register_player(name=agent_name2, algorithm=DarrenPlayer())
     # config.register_player(name=agent_name1, algorithm=agent1())
     # config.register_player(name=agent_name2, algorithm=agent2())
 

@@ -3,3 +3,6 @@
 .idea/misc.xml
 .idea/workspace.xml
 game.py
+*.strat
+*.cards
+*.group
