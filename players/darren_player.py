@@ -21,12 +21,11 @@ class DarrenPlayer(BasePokerPlayer):
     )
     gened_hole_card = gen_cards(hole_card)
     gened_community_card = gen_cards(community_card)
-    print(hole_card.__str__())
-    if len(community_card) != 0:
-      # print(round_state["street"])
-      # print(community_card)
-      print(get_community_card_in_hand(gened_hole_card, gened_community_card))
-      # print(HandEvaluator.gen_hand_rank_info(gened_hole_card, gened_community_card))
+    street = round_state["street"]
+    print("Street: %s" %street)
+    print("Hole: %s" %hole_card.__str__())
+    if street != "flop" and street != "preflop":
+      community_card_in_hand = get_community_card_in_hand(gened_hole_card, gened_community_card)
 
     can_call = len([item for item in valid_actions if item['action'] == 'call']) > 0
     can_raise = len([item for item in valid_actions if item['action'] == 'raise']) > 0
@@ -66,25 +65,27 @@ class DarrenPlayer(BasePokerPlayer):
     pass
 
   def receive_round_result_message(self, winners, hand_info, round_state):
-    print("Round End Hand Info: %s", hand_info)
     pass
 
 def setup_ai():
   return DarrenPlayer()
 
 def get_community_card_in_hand(hole_card, community_card):
-  hand = HandEvaluator.gen_hand_rank_info(hole_card, community_card).get("hand")
+  rank_info = HandEvaluator.gen_hand_rank_info(hole_card, community_card)
+  hand = rank_info.get("hand")
+  strength = hand["strength"]
+  print(strength)
   community_card_in_hand = sorted(community_card, reverse=True)
   for card in community_card_in_hand:
     if len(community_card_in_hand) == 3:
       break
     if not (card.rank == hand["low"] or card.rank == hand["high"]):
-      community_card_in_hand.remove(card)
+      if not(strength == "FLASH" or strength == "STRAIGHTFLASH" and \
+          (hole_card[0].suit != card.suit or hole_card[1].suit != card.suit)):
+        community_card_in_hand.remove(card)
   i = 0
   while i < len(community_card_in_hand):
     community_card_in_hand[i] = community_card_in_hand[i].__str__()
     i = i + 1
 
   return community_card_in_hand
-      
-

@@ -16,3 +16,6 @@ def get_all_possible_cards():
 
 def get_all_combinations(cards, n):
     return list(combinations(cards, n))
+
+def evaluate_all_flops():
+    all_cards = get_all_possible_cards()

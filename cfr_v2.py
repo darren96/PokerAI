@@ -69,16 +69,16 @@ class CFR:
         elif key2 in holes:
             hand = "%dG" %holes[key2]
         
-        if community_cards != None:
-            for i in range(0, 2):
-                community1 = community_cards[hand][0] if i != 0 else community_cards[hand][1]
-                community2 = community_cards[hand][1] if i != 0 or 1 else community_cards[hand][2]
-                key1 = "('%s', '%s', '%s')" %(community[i], community1, community2)
-                key2 = "('%s', '%s', '%s')" %(community[i], community2, community1)
-            if key1 in communities:
-                hand = "%dG" %communities[key1]
-            elif key2 in communities:
-                hand = "%dG" %communities[key2]
+        # if community_cards != None:
+        #     for i in range(0, 2):
+        #         community1 = community_cards[hand][0] if i != 0 else community_cards[hand][1]
+        #         community2 = community_cards[hand][1] if i != 0 or 1 else community_cards[hand][2]
+        #         key1 = "('%s', '%s', '%s')" %(community[i], community1, community2)
+        #         key2 = "('%s', '%s', '%s')" %(community[i], community2, community1)
+        #     if key1 in communities:
+        #         hand = "%dG" %communities[key1]
+        #     elif key2 in communities:
+        #         hand = "%dG" %communities[key2]
 
         return hand
 
@@ -168,21 +168,21 @@ class CFR:
             # print "Hand: %s" % hand
             history = state[2:] if len(hand) == 2 else state[3:]
             # history = state[4:]
-            # print "hand: %s \nhistory: %s" %(hand, history)
+            print "hand: %s \nhistory: %s" %(hand, history)
 
             # player 1
             if len(history) == 0:
-                result[p1_bet][hand] = node.strategy_[Game.BET]
+                result[p1_bet][hand] = node.strategy_[Game.RAISE]
             # player 2
             elif len(history) == 1:
-                result[p2_raise][hand] = node.strategy_[Game.BET]
+                result[p2_raise][hand] = node.strategy_[Game.RAISE]
                 result[p2_call][hand] = node.strategy_[Game.CALL]
             # player 1
             elif len(history) == 2:
-                if history[0] == Game.BET:
+                if history[0] == Game.RAISE:
                     result[p1_bet_call][hand] = node.strategy_[Game.CALL]
                 else:
-                    result[p1_check_raise][hand] = node.strategy_[Game.BET]
+                    result[p1_check_raise][hand] = node.strategy_[Game.RAISE]
                     result[p1_check_call][hand] = node.strategy_[Game.CALL]
             # player 2
             elif len(history) == 3:
@@ -225,41 +225,41 @@ class CFR:
 
         # print "probability_weight: " + str(probability_weight)
         # print "num_moves: " + str(num_moves)
+        if num_moves >= 1:
+            # Opponent folded
+            if history[-1] == Game.FOLD:
+                num_bets = 0
+                for action in history:
+                    if action == Game.RAISE:
+                        num_bets += 1
 
-        # Opponent folded
-        if history[-1] == Game.FOLD:
-            num_bets = 0
-            for action in history:
-                if action == Game.BET:
-                    num_bets += 1
+                if num_bets == 2:
+                    # print "Opponent folded, Player " + str(player) + " won " + str(self.ante + self.bet1)
+                    return self.ante + self.bet1
 
-            if num_bets == 2:
-                # print "Opponent folded, Player " + str(player) + " won " + str(self.ante + self.bet1)
-                return self.ante + self.bet1
+                return self.ante
+            # Opponent called a bet
+            if history[-1] == Game.CALL:
 
-            return self.ante
-        # Opponent called a bet
-        if history[-1] == Game.CALL:
+                winner = self.get_winner(player_hand, opponent_hand)
 
-            winner = self.get_winner(player_hand, opponent_hand)
+                if winner == 0:
+                    # print "Player " + str(player) + " calls the bet and lost"
+                    return 0
 
-            if winner == 0:
-                # print "Player " + str(player) + " calls the bet and lost"
-                return 0
+                reward = self.ante
+                num_bets = 0
+                for action in history:
+                    if action == Game.RAISE:
+                        num_bets += 1
+                if num_bets == 2:
+                    reward += self.bet2
+                elif num_bets == 1:
+                    reward += self.bet1
 
-            reward = self.ante
-            num_bets = 0
-            for action in history:
-                if action == Game.BET:
-                    num_bets += 1
-            if num_bets == 2:
-                reward += self.bet2
-            elif num_bets == 1:
-                reward += self.bet1
-
-            # print "Player " + str(player) + " calls the bet and won " + str(reward)
-            return reward if winner == 1 else -reward
-    
+                # print "Player " + str(player) + " calls the bet and won " + str(reward)
+                return reward if winner == 1 else -reward
+        
         # state = str(player_hand)
         p_hand = self.simplify_hand(player_hand)
         state = str(p_hand)
@@ -276,17 +276,19 @@ class CFR:
             # Create new Node with possible actions we can perform
 
             # print "state is not inside game tree"
-
-            if history[-1] == Game.BET:
-                possible_actions = [Game.CALL, Game.FOLD]
-                num_bets = 0
-                for action in history:
-                    if action == Game.BET:
-                        num_bets += 1
-                if num_bets == 1:
-                    possible_actions.append(Game.BET)
+            if len(history) == 0:
+                possible_actions = [Game.CALL, Game.RAISE]
             else:
-                possible_actions = [Game.CALL, Game.BET]
+                if history[-1] == Game.RAISE:
+                    possible_actions = [Game.CALL, Game.FOLD]
+                    num_bets = 0
+                    for action in history:
+                        if action == Game.RAISE:
+                            num_bets += 1
+                    if num_bets == 1:
+                        possible_actions.append(Game.RAISE)
+                else:
+                    possible_actions = [Game.CALL, Game.RAISE]
 
             nodce = Node(possible_actions)
 
@@ -377,8 +379,8 @@ class Node:
 ante = 5.0
 bet1 = 10.0
 bet2 = 20.0
-holes = pickle.load(open("../2hand_groups_py2.cards"))
-communities = pickle.load(open("../3hand.group"))
+holes = pickle.load(open("2hand_groups_py2.cards"))
+# communities = pickle.load(open("../3hand_cleaned.group"))
 util = cfr.train(10000000, ante, bet1, bet2)
 print "Player One Expected Value Per Hand: %f" % util
 result = cfr.get_strategy()

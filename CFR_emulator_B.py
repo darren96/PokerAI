@@ -1,9 +1,10 @@
 from pypokerengine.api.emulator import Emulator
 from pypokerengine.utils.card_utils import gen_cards
+from pypokerengine.engine.hand_evaluator import HandEvaluator
 from multiprocessing import Pool
 import pickle
 
-ITERATIONS = 6000
+ITERATIONS = 8000
 ACTION_TO_HISTORY_MAPPING = {"fold": "0", "call": "1", "raise": "2", "small_blind": "3", "big_blind": "4", "ante": "5"}
 HISTORY_TO_ACTION_MAPPING = {"0": "fold", "1": "call", "2": "raise", "3": "small_blind", "4": "big_blind", "5": "ante"}
 
@@ -35,9 +36,9 @@ class CFR:
                 Th 9s becomes T9o as both cards do not share the same suit (off-suit)
                 Th Ts becomes TT (pair of tens)
         """
-        hand = gen_cards(hand)
-        card1 = hand[0]
-        card2 = hand[1]
+        generated_hand = gen_cards(hand)
+        card1 = generated_hand[0]
+        card2 = generated_hand[1]
 
         # pair
         if card1.rank == card2.rank:
@@ -49,6 +50,11 @@ class CFR:
         hand += str(card2)[1] if hand == str(card1)[1] else str(card1)[1]
         hand += str("s") if str(card1)[0] == str(card2)[0] else str("o")
         # print "final hand %s" % hand
+
+        if len(community_cards) >= 3:
+          strength = HandEvaluator.gen_hand_rank_info(generated_hand, gen_cards(community_cards))
+          hand += "_%s" %strength.get("hand")["strength"]
+
         return hand
 
 
@@ -64,7 +70,7 @@ class CFR:
 
         for i in range(iterations):
             if i % print_interval == 0 and i != 0:
-                print "P1 expected value after %i iterations: %f" % (i, util / i)
+                print("P1 expected value after %i iterations: %f" % (i, util / i))
                 # for j in range(-1, 17):
                 #     try:
                 #         print j, strats["_" + str(j) + "G"]
@@ -80,7 +86,7 @@ class CFR:
             cards = [player_one_cards, player_two_cards]
             history = list()
             util += self.cfr(cards, history, round_start, events, 1, 1)
-            strats = self.get_strategy()
+            # strats = self.get_strategy()
 
             # """
             # if i%save_interval == 0:
@@ -244,7 +250,7 @@ def jobWrapper(i):
     bet1 = 10.0
     bet2 = 20.0
     util = cfr.train(ITERATIONS, ante, bet1, bet2)
-    print "Player One Expected Value Per Hand: %f" % util
+    print("Player One Expected Value Per Hand: %f" % util)
     result = cfr.get_strategy()
     # print "Final strategy: " + str(result)
     pickle.dump(result, open("strats/job_%d.strat" %i, "wb"))
@@ -252,7 +258,7 @@ def jobWrapper(i):
 
 # holes = pickle.load(open("2hand_groups_py2.cards"))
 # communities = pickle.load(open("3hand_cleaned.group"))
-jobWrapper(1)
+jobWrapper(1000)
 # pool = Pool(processes=4)
 # print(pool.map(jobWrapper, list(range(4))))
 # pool.close()
